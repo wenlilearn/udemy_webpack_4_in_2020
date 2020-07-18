@@ -4,13 +4,22 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 module.exports = {
-  entry: './src/index.js',
+  entry: {
+    'hello-world': './src/hello-world.js',
+    'pig': './src/pig.js'
+  },
   output: {
-    filename: 'bundle.[contenthash].js',
+    filename: '[name].[contenthash].js',
     path: path.resolve(__dirname, './dist'),
     publicPath: ''
   },
   mode: 'production',
+  optimization: {
+    splitChunks: {
+      chunks: "all",
+      minSize: 10000
+    }
+  },
   // Loaders here
   module: {
     rules: [
@@ -58,7 +67,7 @@ module.exports = {
   },
   plugins: [
     new MiniCssExtractPlugin({
-      filename: 'styles.[contenthash].css',
+      filename: '[name].[contenthash].css',
     }),
     new CleanWebpackPlugin({
       cleanOnceBeforeBuildPatterns: [
@@ -68,9 +77,17 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       title: "Hello World",
-      // filename: 'custom_filename.html',
-      description: "Some description",
-      template: "./src/index.hbs"
+      filename: 'hello-world.html',
+      chunks: ['hello-world', 'vendors~hello-world~pig'],
+      description: "Hello World",
+      template: "./src/template.hbs"
+    }),
+    new HtmlWebpackPlugin({
+      title: "Pig",
+      filename: 'pig.html',
+      chunks: ['pig', 'vendors~hello-world~pig'],
+      description: "Guinea Pig",
+      template: "./src/template.hbs"
     })
   ]
 }
